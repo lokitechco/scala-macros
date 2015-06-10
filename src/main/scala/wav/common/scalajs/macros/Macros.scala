@@ -67,7 +67,7 @@ object JS {
          import scalajs.js.JSConverters._
          val p = scala.scalajs.js.Dynamic.literal(..$vals)
          ..$undefs
-         scala.scalajs.js.Dynamic.global.console.log(p)
+         scala.scalajs.js.Dynamic.global.console.debug(${tpe.typeSymbol.fullName}, p)
          p
       }
     """
