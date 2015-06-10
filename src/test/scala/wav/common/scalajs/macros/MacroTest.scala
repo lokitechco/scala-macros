@@ -16,7 +16,11 @@ object Test {
 
   case class Simple(s: String, t: enum.Value)
 
+  case class Simple2(s: String, t: Option[enum.Value])
+
   val simpleTest = JS[Simple]
+
+  val simpleTest2 = JS[Simple2]
 
   case class SimpleOption(so: Option[String])
 

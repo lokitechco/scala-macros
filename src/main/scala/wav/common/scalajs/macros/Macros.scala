@@ -41,13 +41,21 @@ object JS {
       else if ((returnType <:< typeOf[GenTraversableOnce[_]] ||
                 returnType <:< typeOf[Array[_]]))
         (0, q"""$decoded -> t.$name.toJSArray""")
+      else if (returnType <:< typeOf[js.Dictionary[_]] &&
+        returnType.typeArgs(0) <:< typeOf[TOJS])
+        (0, q"""$decoded -> t.$name.map((k: String, o: $symToJs) => (k, o.toJs))""")
+      else if (returnType <:< typeOf[js.Array[_]] &&
+        returnType.typeArgs(0) <:< typeOf[TOJS])
+        (0, q"""$decoded -> t.$name.map((o: $symToJs) => o.toJs)""")
       else if (returnType <:< typeOf[Option[_]] ||
             returnType <:< typeOf[js.UndefOr[_]]) {
-        if (returnType.typeArgs(0) <:< typeOf[TOJS]) {
+        val arg0 = returnType.typeArgs(0)
+        if (arg0 <:< typeOf[TOJS])
           (1, q"""t.$name.foreach(v => p.updateDynamic($decoded)(v.toJs))""")
-        } else {
+        else if (arg0 <:< typeOf[Enumeration#Value])
+          (1, q"""t.$name.foreach(v => p.updateDynamic($decoded)(v.toString()))""")
+        else
           (1, q"""t.$name.foreach(v => p.updateDynamic($decoded)(v))""")
-        }
       }
       else
         (0, q"""$decoded -> t.$name""")
